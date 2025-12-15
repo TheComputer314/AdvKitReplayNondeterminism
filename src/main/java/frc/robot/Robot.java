@@ -61,14 +61,6 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput("PeriodicTimestamp", Timer.getTimestamp());
         Logger.recordOutput("TestCommandCount", count);
-
-        if (mode != Mode.REPLAY) {
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(5, 35));
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override
