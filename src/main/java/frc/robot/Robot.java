@@ -47,13 +47,12 @@ public class Robot extends LoggedRobot {
 
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
-      var testSubsystem = new TestSubsystem();
-
         controller.a()
-                .whileTrue(new FunctionalCommand(testSubsystem::startCounter, () -> {
+                .whileTrue(new FunctionalCommand(() -> System.out.println("Started Counter"),
+                  () -> {
                   Logger.recordOutput("CommandTimestamp", Timer.getTimestamp());
                   count++;
-                }, (interrupted) -> testSubsystem.stopCounter(), () -> false));
+                }, (interrupted) -> System.out.println("Stopped Counter"), () -> false).ignoringDisable(true));
     }
 
     @Override
