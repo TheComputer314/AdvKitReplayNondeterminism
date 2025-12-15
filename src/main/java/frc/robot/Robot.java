@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -39,18 +40,20 @@ public class Robot extends LoggedRobot {
             setUseTiming(false); // Run as fast as possible
             String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
             Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_replay"))); // Save outputs to a new log
 
             DriverStation.silenceJoystickConnectionWarning(true);
         }
 
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
+      var testSubsystem = new TestSubsystem();
+
         controller.a()
-                .whileTrue(Commands.run(() -> {
-                    Logger.recordOutput("CommandTimestamp", Timer.getTimestamp());
-                    count++;
-                }));
+                .whileTrue(new FunctionalCommand(testSubsystem::startCounter, () -> {
+                  Logger.recordOutput("CommandTimestamp", Timer.getTimestamp());
+                  count++;
+                }, (interrupted) -> testSubsystem.stopCounter(), () -> false));
     }
 
     @Override
@@ -58,7 +61,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         Logger.recordOutput("PeriodicTimestamp", Timer.getTimestamp());
-        Logger.recordOutput("Count", count);
+        Logger.recordOutput("TestCommandCount", count);
 
         if (mode != Mode.REPLAY) {
             try {
