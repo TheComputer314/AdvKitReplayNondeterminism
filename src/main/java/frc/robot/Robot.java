@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -61,6 +63,7 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput("PeriodicTimestamp", Timer.getTimestamp());
         Logger.recordOutput("TestCommandCount", count);
+        Logger.recordOutput("ButtonHeld", controller.getHID().getAButton());
     }
 
     @Override
