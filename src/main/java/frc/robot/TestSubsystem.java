@@ -1,11 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class TestSubsystem extends SubsystemBase {
-    private int counter = 0;
+    private int counter = 1;
     private boolean counterStarted = false;
 
     @Override
@@ -14,7 +13,7 @@ public class TestSubsystem extends SubsystemBase {
       if (counterStarted) {
         counter++;
       }
-        Logger.recordOutput("TestSubsystemCounter",counter);
+      Logger.recordOutput("TestSubsystemCounter",counter);
     }
 
     public void startCounter() {
