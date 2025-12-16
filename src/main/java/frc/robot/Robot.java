@@ -7,11 +7,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -28,52 +25,26 @@ public class Robot extends LoggedRobot {
     REPLAY
   }
 
-  @SuppressWarnings("FieldCanBeLocal")
-  private final CommandXboxController controller = new CommandXboxController(0);
-
-  private int count = 0;
+  private final XboxController controller = new XboxController(0);
 
   public Robot() {
     if (isReal() || mode != Mode.REPLAY) {
-      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+      Logger.addDataReceiver(new WPILOGWriter());
+      Logger.addDataReceiver(new NT4Publisher());
     } else {
-      setUseTiming(false); // Run as fast as possible
-      String logPath =
-          LogFileUtil
-              .findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      Logger.addDataReceiver(
-          new WPILOGWriter(
-              LogFileUtil.addPathSuffix(logPath, "_replay"))); // Save outputs to a new log
-
-      DriverStation.silenceJoystickConnectionWarning(true);
+      setUseTiming(false);
+      String logPath = LogFileUtil.findReplayLog();
+      Logger.setReplaySource(new WPILOGReader(logPath));
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_replay")));
     }
 
-    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
-    // be added.
-
-    controller
-        .a()
-        .whileTrue(
-            new FunctionalCommand(
-                    () -> System.out.println("Started Counter"),
-                    () -> {
-                      Logger.recordOutput("CommandTimestamp", Timer.getTimestamp());
-                      count++;
-                    },
-                    (interrupted) -> {
-                      System.out.println("Stopped Counter");
-                    },
-                    () -> false)
-                .ignoringDisable(true));
+    Logger.start();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    Logger.recordOutput("PeriodicTimestamp", Timer.getTimestamp());
-    Logger.recordOutput("TestCommandCount", count);
+    Logger.recordOutput("ControllerA", controller.getAButton());
   }
 }
