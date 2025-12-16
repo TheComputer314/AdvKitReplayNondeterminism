@@ -7,44 +7,21 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 
-public class Robot extends LoggedRobot {
-  private static final Mode mode = Mode.REPLAY;
-
-  public enum Mode {
-    REAL,
-    SIM,
-    REPLAY
-  }
-
-  private final XboxController controller = new XboxController(0);
-
+public class Robot extends TimedRobot {
   public Robot() {
-    if (isReal() || mode != Mode.REPLAY) {
-      Logger.addDataReceiver(new WPILOGWriter());
-      Logger.addDataReceiver(new NT4Publisher());
-    } else {
-      setUseTiming(false);
-      String logPath = LogFileUtil.findReplayLog();
-      Logger.setReplaySource(new WPILOGReader(logPath));
-      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_replay")));
-    }
-
-    Logger.start();
+    DataLogManager.start();
+    var log = DataLogManager.getLog();
+    DriverStation.startDataLog(log);
   }
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
-
-    Logger.recordOutput("ControllerA", controller.getAButton());
+    DriverStationSim.setJoystickButton(0, 1, true);
+    DriverStationSim.notifyNewData();
   }
 }
